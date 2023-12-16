@@ -1,8 +1,9 @@
 import React from 'react';
-import { GoogleLogin } from 'react-google-login';
+import GoogleLogin from '@leecheuk/react-google-login';
 
 const GoogleSignin = ({ onSignIn }) => {
   const responseGoogle = (response) => {
+    console.log(response);
     // Handle the Google Sign-In response
     onSignIn(response);
   };
