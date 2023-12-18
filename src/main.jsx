@@ -1,12 +1,13 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-// import GoogleSignIn from './GoogleSignIn.jsx'
-// import GoogleSignUp from './GoogleSignup.jsx'
-import './index.css'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import App from './App';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-)
+ReactDOM.render(
+    <GoogleOAuthProvider clientId="659923643572-c10atj9s2mvpac0oue46nsmepu1p1v80.apps.googleusercontent.com">
+        <React.StrictMode>
+            <App />
+        </React.StrictMode>
+    </GoogleOAuthProvider>,
+    document.getElementById('root')
+);

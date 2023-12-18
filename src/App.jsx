@@ -1,35 +1,60 @@
-  import React, { useEffect } from 'react';
-  import jwt from 'jsonwebtoken';
+import React, { useState, useEffect } from 'react';
+import { googleLogout, useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
+function App() {
+    const [ user, setUser ] = useState([]);
+    const [ profile, setProfile ] = useState([]);
 
-  const SignUpPage = () => {
-    const handleCallbackResponse = (response) => {
-      // Handle the Google Sign-Up response
-      const token = response.credential;
-      const decodedToken = jwt.decode(token);
-      console.log("JWT ID: " + decodedToken.sub);
+    const login = useGoogleLogin({
+        onSuccess: (codeResponse) => setUser(codeResponse),
+        onError: (error) => console.log('Login Failed:', error)
+    });
+
+    useEffect(
+        () => {
+            if (user) {
+                axios
+                    .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
+                        headers: {
+                            Authorization: `Bearer ${user.access_token}`,
+                            Accept: 'application/json'
+                        }
+                    })
+                    .then((res) => {
+                        setProfile(res.data);
+                    })
+                    .catch((err) => console.log(err));
+            }
+        },
+        [ user ]
+    );
+
+    // log out function to log the user out of google and set the profile array to null
+    const logOut = () => {
+        googleLogout();
+        setProfile(null);
     };
-    
-
-    useEffect(() => {
-      
-      google.accounts.id.initialize({
-        client_id:"659923643572-c10atj9s2mvpac0oue46nsmepu1p1v80.apps.googleusercontent.com",
-        callback:handleCallbackResponse
-      })
-
-      google.accounts.id.renderButton(
-        document.getElementById("singInDiv"),
-        {theme: "outline", size: "large"}
-      );
-    }, [])
 
     return (
-      <div>
-        <h2>Sign Up</h2>
-        <div id='singInDiv'></div>
-      </div>
+        <div>
+            <h2>React Google Login</h2>
+            <br />
+            <br />
+            {profile ? (
+                <div>
+                    <img src={profile.picture} alt="user image" />
+                    <h3>User Logged in</h3>
+                    <p>Name: {profile.name}</p>
+                    <p>Email Address: {profile.email}</p>
+                    <br />
+                    <br />
+                    <button onClick={logOut}>Log out</button>
+                </div>
+            ) : (
+                <button onClick={() => login()}>Sign in with Google 🚀 </button>
+            )}
+        </div>
     );
-  };
-
-  export default SignUpPage;
+}
+export default App;
